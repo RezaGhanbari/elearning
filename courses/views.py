@@ -21,7 +21,7 @@ class OwnerCourseMixin(OwnerMixin, LoginRequiredMixin):
     model = Course
 
 
-class OwnerCourseEditMixin(object):
+class OwnerCourseEditMixin(OwnerCourseMixin, OwnerEditMixin):
     fields = ['subject', 'title', 'slug', 'overview']
     success_url = reverse_lazy('manage_course_list')
     template_name = 'courses/manage/course/form.html'
@@ -40,18 +40,13 @@ class CourseCreateView(PermissionRequiredMixin,
 class CourseUpdateView(PermissionRequiredMixin,
                        OwnerCourseEditMixin,
                        UpdateView):
-    template_name = 'courses/manage/course/form.html'
     permission_required = 'courses.change_course'
 
 
 class CourseDeleteView(PermissionRequiredMixin,
                        OwnerCourseMixin,
                        DeleteView):
-    template_name = 'courses/manage/course/delete.html'
     success_url = reverse_lazy('manage_course_list')
+    template_name = 'courses/manage/course/delete.html'
     permission_required = 'courses.delete_course'
-
-    def get_queryset(self):
-        qs = super(ManageCourseListView, self).get_queryset()
-        return qs.filter(owner=self.request.user)
 
